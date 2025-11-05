@@ -2,14 +2,8 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- API Configuration ---
-    // ===================================================================================
-    // === IMPORTANT: PASTE YOUR GOOGLE AI API KEY HERE ==================================
-    //
-    // Get your free key from Google AI Studio: https://aistudio.google.com/app/apikey
-    //
-    // ===================================================================================
-    const API_KEY = "AIzaSyAKwlvCu-f2j8RR6nXaRSGhQmnNJ7vVgAg"; 
-    
+
+// The API_KEY is now loaded from config.js, which is in .gitignore    
     const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${API_KEY}`;
     
     // --- Global Element Selectors ---
