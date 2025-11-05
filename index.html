@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered CloneLab v2.0</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Load Custom Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-900 text-slate-300 min-h-screen flex flex-col">
+
+    <!-- HEADER -->
+    <header class="bg-slate-800 shadow-lg z-10">
+        <div class="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
+            <h1 class="text-2xl font-bold text-white">
+                <span class="text-sky-400">AI</span> CloneLab
+            </h1>
+            <!-- Main Mode Tabs -->
+            <div class="flex space-x-2">
+                <button id="tab-btn-scaffolder" class="tab-btn-main bg-sky-600 text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" /></svg>
+                    <span>AI Scaffolder</span>
+                </button>
+                <button id="tab-btn-clonelab" class="tab-btn-main">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z" /><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.022 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" /></svg>
+                    <span>CloneLab IDE</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENT AREA -->
+    <main class="flex-1 flex flex-col overflow-hidden">
+        
+        <!-- MODE 1: AI SCAFFOLDER -->
+        <div id="scaffolder-view" class="flex flex-col items-center justify-center p-8 h-full">
+            <div class="w-full max-w-4xl text-center">
+                <h2 class="text-3xl font-bold text-white">AI Scaffolder</h2>
+                <p class="mt-2 text-lg text-slate-400">Paste your target site's `outerHTML` to generate a clean skeleton file.</p>
+                <div class="mt-6 p-4 bg-sky-900/50 border border-sky-700 rounded-lg text-left text-sky-200">
+                    <strong>How to get `outerHTML`:</strong>
+                    <ol class="list-decimal list-inside mt-2">
+                        <li>Go to your target site (e.g., discord.com).</li>
+                        <li>Open Developer Tools (F12 or Right-click > Inspect).</li>
+                        <li>In the "Elements" tab, right-click the `<body>` element.</li>
+                        <li>Click <strong>"Copy" > "Copy outerHTML"</strong>.</li>
+                    </ol>
+                </div>
+
+                <textarea id="scaffolder-input" class="code-editor w-full h-48 mt-6" placeholder="Paste your outerHTML here..."></textarea>
+                <button id="scaffolder-btn-generate" class="mt-6 w-full flex items-center justify-center h-14 px-8 text-lg font-semibold bg-sky-600 text-white rounded-lg shadow-lg hover:bg-sky-500 transition duration-300">
+                    <svg id="scaffolder-btn-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m1.636-6.364l.707.707M12 21v-1m6.364-1.636l-.707-.707M6.343 6.343l.707.707" /></svg>
+                    <span id="scaffolder-btn-text">Generate Skeleton</span>
+                    <div id="scaffolder-spinner" class="spinner hidden"></div>
+                </button>
+            </div>
+        </div>
+
+        <!-- MODE 2: CLONELAB IDE -->
+        <div id="clonelab-view" class="hidden flex-1 grid grid-cols-1 lg:grid-cols-2 overflow-hidden gap-2 p-2">
+            
+            <!-- Left Pane: Editor -->
+            <div class="flex flex-col bg-slate-800 rounded-lg overflow-hidden">
+                <!-- Editor Tabs -->
+                <div class="flex-shrink-0 bg-slate-900 px-2 pt-2 flex space-x-1">
+                    <button id="editor-tab-btn-html" class="editor-tab-btn bg-slate-800">HTML</button>
+                    <button id="editor-tab-btn-css" class="editor-tab-btn">CSS</button>
+                    <button id="editor-tab-btn-js" class="editor-tab-btn">JS</button>
+                </div>
+                
+                <!-- HTML Editor -->
+                <div id="html-editor-pane" class="editor-pane flex-1">
+                    <textarea id="html-editor" class="code-editor w-full h-full" placeholder="<!-- Your AI-generated skeleton will appear here -->"></textarea>
+                </div>
+
+                <!-- CSS Editor & Translator -->
+                <div id="css-editor-pane" class="editor-pane hidden flex-1 flex flex-col p-4 space-y-4">
+                    <div class="flex-1 flex flex-col">
+                        <label for="css-editor" class="text-sm font-medium text-slate-400 mb-2">Custom CSS</label>
+                        <textarea id="css-editor" class="code-editor w-full flex-1" placeholder="/* Your custom CSS goes here */"></textarea>
+                    </div>
+                    <div class="flex-1 flex flex-col border-t border-slate-700 pt-4">
+                        <h3 class="text-lg font-semibold text-white mb-2">AI Tailwind Translator</h3>
+                        <p class="text-sm text-slate-400 mb-2">Paste CSS from the inspector to convert it to Tailwind.</p>
+                        <textarea id="css-translator-input" class="code-editor w-full h-32" placeholder="/* Paste raw CSS here */"></textarea>
+                        <button id="css-translator-btn" class="mt-3 w-full flex items-center justify-center h-10 px-4 text-sm font-semibold bg-sky-600 text-white rounded-lg hover:bg-sky-500 transition duration-300">
+                            <svg id="css-translator-btn-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                            <span id="css-translator-btn-text">Translate</span>
+                            <div id="css-translator-spinner" class="spinner w-5 h-5 hidden"></div>
+                        </button>
+                        <div id="css-translator-output-wrapper" class="mt-3 hidden">
+                            <label class="text-sm font-medium text-slate-400 mb-2">AI Output:</label>
+                            <pre id="css-translator-output" class="code-editor w-full h-40 overflow-auto bg-slate-900"></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- JS Editor -->
+                <div id="js-editor-pane" class="editor-pane hidden flex-1">
+                    <textarea id="js-editor" class="code-editor w-full h-full" placeholder="// Your JavaScript goes here"></textarea>
+                </div>
+            </div>
+
+            <!-- Right Pane: Preview -->
+            <div class="flex flex-col bg-slate-800 rounded-lg overflow-hidden">
+                <!-- Responsive Toolbar -->
+                <div class="flex-shrink-0 bg-slate-900 h-14 flex items-center justify-between px-4">
+                    <div class="flex items-center space-x-2">
+                        <button title="Mobile" class="responsive-btn" data-w="390" data-h="844">
+                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                        </button>
+                        <button title="Tablet" class="responsive-btn" data-w="768" data-h="1024">
+                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" transform="rotate(90 12 12) scale(1.2, 0.9)" /></svg>
+                        </button>
+                        <button title="Desktop" class="responsive-btn" data-w="100%" data-h="100%">
+                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-2 text-sm text-white">
+                        <input id="preview-width" type="number" class="w-16 bg-slate-700 rounded p-1 text-center" placeholder="W">
+                        <span>x</span>
+                        <input id="preview-height" type="number" class="w-16 bg-slate-700 rounded p-1 text-center" placeholder="H">
+                        <button id="preview-rotate" title="Rotate" class="responsive-btn">
+                            <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m-15.357-2A8.001 8.001 0 0019.418 15m0 0H15" /></svg>
+                        </button>
+                    </div>
+                </div>
+                <!-- Preview Iframe -->
+                <div class="flex-1 p-4 bg-slate-900 flex items-center justify-center overflow-auto">
+                    <iframe id="preview-frame" class="bg-white shadow-xl transition-all duration-300" style="width: 100%; height: 100%; border: none; border-radius: 0.5rem;"></iframe>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Error/Message Modal -->
+    <div id="error-modal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-lg shadow-2xl max-w-sm w-full">
+            <div class="p-6 border-b border-red-500/30">
+                <h3 class="text-xl font-semibold text-red-400" id="error-title">Error</h3>
+            </div>
+            <div class="p-6">
+                <p id="error-message" class="text-slate-300">An error occurred.</p>
+            </div>
+            <div class="p-4 bg-slate-700/50 rounded-b-lg flex justify-end">
+                <button id="error-close-btn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load Main JavaScript Logic -->
+    <script src="app.js"></script>
+</body>
+</html>
